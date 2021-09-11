@@ -1,7 +1,13 @@
 * text=auto
+
 /.github export-ignore
-.styleci.yml export-ignore
-.scrutinizer.yml export-ignore
-BACKERS.md export-ignore
-CONTRIBUTING.md export-ignore
-CHANGELOG.md export-ignore
+/app export-ignore
+/bootstrap export-ignore
+/config export-ignore
+/tests export-ignore
+/.gitignore export-ignore
+/box.json export-ignore
+/laradra export-ignore
+/phpcs.xml export-ignore
+/phpunit.xml.dist export-ignore
+/README.md export-ignore
