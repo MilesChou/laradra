@@ -40,7 +40,7 @@ return [
     */
 
     'add' => [
-
+        Laradra\Commands\Session\Query::class,
     ],
 
     /*
