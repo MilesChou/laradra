@@ -16,9 +16,11 @@
     ],
     "require": {
         "php": "^7.3 | ^8.0",
-        "illuminate/database": "^8 | ^9"
+        "illuminate/database": "^8 | ^9",
+        "illuminate/events": "^8"
     },
     "require-dev": {
+        "illuminate/log": "^8 | ^9",
         "laravel-zero/framework": "^8 | ^9",
         "mockery/mockery": "^1.4.3",
         "pestphp/pest": "^1.3",

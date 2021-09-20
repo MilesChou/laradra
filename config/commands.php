@@ -41,8 +41,10 @@ return [
 
     'add' => [
         Laradra\Commands\Session\Query::class,
-        Laradra\Commands\Session\RevokeCommand::class,
-        Laradra\Commands\Session\Revoke\ExplainCommand::class,
+        Laradra\Commands\Session\Revoke\ExplainConsentCommand::class,
+        Laradra\Commands\Session\Revoke\ExplainLoginCommand::class,
+        Laradra\Commands\Session\Revoke\RevokeConsentCommand::class,
+        Laradra\Commands\Session\Revoke\RevokeLoginCommand::class,
     ],
 
     /*
