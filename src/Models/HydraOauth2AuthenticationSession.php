@@ -2,6 +2,7 @@
 
 namespace Laradra\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -21,4 +22,16 @@ class HydraOauth2AuthenticationSession extends Model
     public $timestamps = false;
 
     public $incrementing = false;
+
+    public function scopeBetween(Builder $query, string $start, string $end): Builder
+    {
+        return $query
+            ->where('authenticated_at', '>', $start)
+            ->where('authenticated_at', '<', $end);
+    }
+
+    public function scopeBetweenWithSubject(Builder $query, string $start, string $end, string $subject): Builder
+    {
+        return $this->scopeBetween($query, $start, $end)->where('subject', '=', $subject);
+    }
 }

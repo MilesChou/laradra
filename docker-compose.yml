@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  laradra:
+    image: ghcr.io/mileschou/php-tester:8.0
+    working_dir: /app
+    command: ["php", "laradra"]
+    environment:
+      HYDRA_CLIENT_ID: some-client
+      HYDRA_CLIENT_SECRET: some-secret
+      HYDRA_REDIRECT_URI: http://web.localhost:8080/rp/callback
+      HYDRA_ADMIN_URL: http://hydra.localhost:4445
+      HYDRA_PUBLIC_URL: http://hydra.localhost:4444
+    volumes:
+      - .:/app:delegated
+    depends_on:
+      - hydra
+
+  hydra:
+    image: oryd/hydra:v1.10.3
+    container_name: hydra.localhost
+    hostname: hydra.localhost
+    ports:
+      - 4444:4444
+    command:
+      serve all --dangerous-force-http
+    environment:
+      DSN: mysql://root:secret@tcp(mysqld:3306)/hydra?max_conns=20&max_idle_conns=4
+      URLS_SELF_ISSUER: http://hydra.localhost:4444
+      URLS_LOGIN: http://web.localhost:8080/provider/login
+      URLS_CONSENT: http://web.localhost:8080/provider/consent
+      URLS_LOGOUT: http://web.localhost:8080/provider/logout
+      TTL_ACCESS_TOKEN: 24h
+      SECRETS_SYSTEM: youReallyNeedToChangeThis
+      OIDC_SUBJECT_TYPES_SUPPORTED: public,pairwise
+      OIDC_SUBJECT_TYPE_PAIRWISE_SALT: youReallyNeedToChangeThis
+      TRACING_PROVIDER: jaeger
+      TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL: http://jaeger:5778/sampling
+      TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS: jaeger:6831
+      TRACING_PROVIDER_JAEGER_SAMPLING_TYPE: const
+      TRACING_PROVIDER_JAEGER_SAMPLING_VALUE: 1
+    restart: unless-stopped
+
+    depends_on:
+      - hydra-migrate
+
+  hydra-migrate:
+    image: oryd/hydra:v1.10.3
+    environment:
+      - DSN=mysql://root:secret@tcp(mysqld:3306)/hydra?max_conns=20&max_idle_conns=4
+    command:
+      migrate sql -e --yes
+    restart: on-failure
+
+  mysqld:
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: hydra
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.21.0
+    ports:
+      - "16686:16686/tcp"

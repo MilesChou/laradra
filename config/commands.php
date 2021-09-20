@@ -41,6 +41,8 @@ return [
 
     'add' => [
         Laradra\Commands\Session\Query::class,
+        Laradra\Commands\Session\RevokeCommand::class,
+        Laradra\Commands\Session\Revoke\ExplainCommand::class,
     ],
 
     /*
