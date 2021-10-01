@@ -1,4 +1,4 @@
-version: '3'
+version: '3.6'
 
 services:
   laradra:
@@ -21,7 +21,8 @@ services:
     container_name: hydra.localhost
     hostname: hydra.localhost
     ports:
-      - 4444:4444
+      - "4444:4444"
+      - "4445:4445"
     command:
       serve all --dangerous-force-http
     environment:
@@ -40,7 +41,6 @@ services:
       TRACING_PROVIDER_JAEGER_SAMPLING_TYPE: const
       TRACING_PROVIDER_JAEGER_SAMPLING_VALUE: 1
     restart: unless-stopped
-
     depends_on:
       - hydra-migrate
 
@@ -51,14 +51,22 @@ services:
     command:
       migrate sql -e --yes
     restart: on-failure
+    depends_on:
+      mysqld:
+        condition: service_healthy
 
   mysqld:
     image: mysql:5.7
     ports:
-      - 3306:3306
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: hydra
+    healthcheck: # Ref: https://github.com/laravel/framework/blob/8.x/.github/workflows/tests.yml
+      test: mysqladmin ping --password=secret
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   jaeger:
     image: jaegertracing/all-in-one:1.21.0

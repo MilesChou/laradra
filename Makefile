@@ -4,6 +4,8 @@ CLIENT_ID := some-client
 CLIENT_SECRET := some-secret
 CLIENT_CALLBACK := http://web.localhost:8080/rp/callback
 
+DOCKER_COMPOSE_COMMAND := docker-compose
+
 .PHONY: all clean clean-all check test coverage setup teardown login
 
 # ---------------------------------------------------------------------
@@ -27,14 +29,14 @@ coverage: test
 	@if [ "`uname`" = "Darwin" ]; then open build/coverage/index.html; fi
 
 up:
-	docker-compose up -d --remove-orphans
-	docker-compose logs -f
+	$(DOCKER_COMPOSE_COMMAND) up -d
+	$(DOCKER_COMPOSE_COMMAND) logs -f
 
 down:
-	docker-compose down -v
+	$(DOCKER_COMPOSE_COMMAND) down -v
 
 setup:
-	docker-compose exec hydra hydra --endpoint http://127.0.0.1:4445/ clients --skip-tls-verify \
+	$(DOCKER_COMPOSE_COMMAND) exec hydra hydra --endpoint http://127.0.0.1:4445/ clients --skip-tls-verify \
 		create \
 		--id ${CLIENT_ID} \
 		--secret ${CLIENT_SECRET} \
@@ -45,5 +47,5 @@ setup:
 		--callbacks ${CLIENT_CALLBACK}
 
 teardown:
-	docker-compose exec hydra hydra --endpoint http://127.0.0.1:4445/ clients --skip-tls-verify \
+	$(DOCKER_COMPOSE_COMMAND) exec hydra hydra --endpoint http://127.0.0.1:4445/ clients --skip-tls-verify \
 		delete ${CLIENT_ID}
