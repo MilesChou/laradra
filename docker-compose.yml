@@ -17,14 +17,14 @@ services:
       - hydra
 
   hydra:
-    image: oryd/hydra:v1.10.3
+    image: oryd/hydra:v2.1.0
     container_name: hydra.localhost
     hostname: hydra.localhost
     ports:
       - "4444:4444"
       - "4445:4445"
     command:
-      serve all --dangerous-force-http
+      serve all --dev
     environment:
       DSN: mysql://root:secret@tcp(mysqld:3306)/hydra?max_conns=20&max_idle_conns=4
       URLS_SELF_ISSUER: http://hydra.localhost:4444
@@ -35,17 +35,12 @@ services:
       SECRETS_SYSTEM: youReallyNeedToChangeThis
       OIDC_SUBJECT_TYPES_SUPPORTED: public,pairwise
       OIDC_SUBJECT_TYPE_PAIRWISE_SALT: youReallyNeedToChangeThis
-      TRACING_PROVIDER: jaeger
-      TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL: http://jaeger:5778/sampling
-      TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS: jaeger:6831
-      TRACING_PROVIDER_JAEGER_SAMPLING_TYPE: const
-      TRACING_PROVIDER_JAEGER_SAMPLING_VALUE: 1
     restart: unless-stopped
     depends_on:
       - hydra-migrate
 
   hydra-migrate:
-    image: oryd/hydra:v1.10.3
+    image: oryd/hydra:v2.1.0-arm64
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/hydra?max_conns=20&max_idle_conns=4
     command:
@@ -56,7 +51,7 @@ services:
         condition: service_healthy
 
   mysqld:
-    image: mysql:5.7
+    image: mysql:8
     ports:
       - "3306:3306"
     environment:
@@ -67,8 +62,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  jaeger:
-    image: jaegertracing/all-in-one:1.21.0
-    ports:
-      - "16686:16686/tcp"
